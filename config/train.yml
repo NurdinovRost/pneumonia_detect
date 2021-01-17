@@ -1,0 +1,54 @@
+model_params:
+  model: resnext101_32x8d
+  pretrained: True
+
+args:
+  expdir: src
+  logdir: logs
+  verbose: True
+
+stages:
+  data_params:
+    batch_size: 32
+    num_workers: 4
+
+  state_params:
+    main_metric: &main_metric accuracy01
+    minimize_metric: &minimize_metric False
+
+  criterion_params:
+    criterion: BCELoss
+
+  optimizer_params:
+    optimizer: Adam
+    lr: 0.003
+
+  scheduler_params:
+    scheduler: ReduceLROnPlateau
+    mode: max
+    patience: 3
+    factor: 0.75
+    verbose: False
+
+  stage1:
+    stage_params:
+      num_epochs: 50
+
+    callbacks_params:
+      loss:
+        callback: CriterionCallback
+
+      optimizer:
+        callback: OptimizerCallback
+
+      scheduler:
+        callback: SchedulerCallback
+
+      accuracy:
+        callback: AccuracyCallback
+
+      tracer:
+        callback: TracerCallback
+        metric: *main_metric
+        minimize: *minimize_metric
+        mode: best
