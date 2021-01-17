@@ -1,0 +1,19 @@
+# MacOS  files
+.DS_store
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.ipynb_checkpoints
+
+# Distribution / packaging
+venv/
+env/
+
+#EDA
+.idea/
+
+# Data
+train/
+test/
+work/
+*.zip
