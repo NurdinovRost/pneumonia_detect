@@ -9,11 +9,13 @@ __pycache__/
 venv/
 env/
 
-#EDA
+# IDE
 .idea/
 
 # Data
-train/
-test/
-work/
 *.zip
+
+# Logs
+logs/
+best_models/
+plots/
