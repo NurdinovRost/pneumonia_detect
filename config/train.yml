@@ -1,27 +1,29 @@
 model_params:
-  model: resnext101_32x8d
-  pretrained: True
+  model: PneumoniaNet
+  encoder_name: densenet121
+  pretrained: False
 
 args:
   expdir: src
-  logdir: logs
+  baselogdir: logs
   verbose: True
 
 stages:
   data_params:
-    batch_size: 32
-    num_workers: 4
+    batch_size: 8
+    num_workers: 2
 
   state_params:
     main_metric: &main_metric accuracy01
     minimize_metric: &minimize_metric False
 
   criterion_params:
-    criterion: BCELoss
+    criterion: CrossEntropyLoss
 
   optimizer_params:
-    optimizer: Adam
+    optimizer: AdamW
     lr: 0.003
+    weight_decay: 0.005
 
   scheduler_params:
     scheduler: ReduceLROnPlateau
@@ -32,7 +34,7 @@ stages:
 
   stage1:
     stage_params:
-      num_epochs: 50
+      num_epochs: 3
 
     callbacks_params:
       loss:
@@ -46,6 +48,18 @@ stages:
 
       accuracy:
         callback: AccuracyCallback
+
+      f1score:
+        callback: F1ScoreCallback
+
+      precision:
+        callback: PrecisionCallback
+
+      recall:
+        callback: RecallCallback
+
+      auc:
+        callback: AUCCallback
 
       tracer:
         callback: TracerCallback

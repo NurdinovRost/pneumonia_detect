@@ -1,6 +1,6 @@
 from torchvision import transforms
 from torch.utils.data import Dataset
-from imgaug import augmenters as iaa
+import imgaug.augmenters as iaa
 from sklearn.model_selection import KFold
 from common import get_annotation, get_binary_image, PATH_TO_TEST
 import numpy as np
@@ -11,9 +11,11 @@ import os
 train_transforms = transforms.Compose([
     transforms.ToPILImage(),
     transforms.Resize(512),
+    transforms.RandomHorizontalFlip(),
     transforms.RandomVerticalFlip(),
-    transforms.RandomRotation((-15, 15)),
-    transforms.Pad((5, 0)),
+    transforms.ColorJitter(brightness=0.2, contrast=0.3, saturation=0.2),
+    transforms.RandomAffine((-25, 25), translate=(0.07, 0.07)),
+    transforms.RandomPerspective(distortion_scale=0.5),
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
@@ -36,13 +38,13 @@ class PneumoniaDataset(Dataset):
             train_ind, val_ind = kf.split(samples).__next__()
             if mode == 'train':
                 self.sample_ids = list(samples[train_ind])
-                self.targets = list(df['target'][train_ind])
+                self.targets = list(np.array(df['target'])[train_ind])
             else:
-                self.sample_ids = samples[val_ind]
-                self.targets = df['target'][val_ind]
+                self.sample_ids = list(samples[val_ind])
+                self.targets = list(np.array(df['target'])[val_ind])
         else:
             path = PATH_TO_TEST
-            self.samples = [os.path.join(path, sample) for sample in os.listdir(path)]
+            self.sample_ids = [os.path.join(path, sample) for sample in os.listdir(path)]
 
         self.transform = transform
 

@@ -19,11 +19,11 @@ class Experiment(ConfigExperiment):
 
         val_set = PneumoniaDataset(mode='val', transform=test_transforms)
 
-        infer_set = PneumoniaDataset(mode='infer', transform=test_transforms)
+        # infer_set = PneumoniaDataset(mode='infer', transform=test_transforms)
 
         datasets["train"] = train_set
         datasets["valid"] = val_set
-        datasets["infer"] = infer_set
+        # datasets["infer"] = infer_set
         print(datasets)
 
         return datasets

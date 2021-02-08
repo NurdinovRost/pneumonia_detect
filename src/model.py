@@ -1,6 +1,6 @@
 import torch.nn as nn
 from catalyst.contrib import registry
-from torchvision.models import resnext50_32x4d, resnext101_32x8d, densenet121, densenet201
+from torchvision.models import resnext50_32x4d, resnext101_32x8d, densenet121, densenet201, resnet50
 from efficientnet_pytorch import EfficientNet
 
 
@@ -12,7 +12,7 @@ class PneumoniaNet(nn.Module):
     def __init__(self, encoder_name, pretrained=True):
         super().__init__()
         if 'efficientnet' in encoder_name:
-            self.model = EfficientNet.from_pretrained(encoder_name)
+            self.model = EfficientNet.from_name(encoder_name)
             self.model.set_swish(False)
             n_features = self.model._fc.in_features
             self.model._fc = nn.Linear(n_features, out_neurons)
@@ -24,7 +24,7 @@ class PneumoniaNet(nn.Module):
                 self.model = resnext101_32x8d(pretrained=pretrained)
             n_features = self.model.fc.in_features
             self.model.fc = nn.Sequential(
-                nn.Dropout(p=0.5),
+                nn.Dropout(p=0.7),
                 nn.Linear(in_features=n_features, out_features=out_neurons, bias=True)
             )
         elif 'densenet' in encoder_name:
@@ -32,11 +32,18 @@ class PneumoniaNet(nn.Module):
                 self.model = densenet121(pretrained=pretrained)
             elif encoder_name == 'densenet201':
                 self.model = densenet201(pretrained=pretrained)
-            n_features = self.model.fc.in_features
+            n_features = self.model.classifier.in_features
             self.model.classifier = nn.Sequential(
-                nn.Dropout(p=0.5),
-                nn.Linear(in_features=n_features, out_features=out_neurons, bias=True)
+                nn.Dropout(p=0.4),
+                nn.Linear(in_features=n_features, out_features=out_neurons)
             )
+        elif 'resnet' in encoder_name:
+            self.model = resnet50(pretrained=pretrained)
+            n_features = self.model.fc.in_features
+            self.model.fc = nn.Linear(in_features=n_features, out_features=out_neurons)
+
+        # for param in self.model.parameters():
+        #     param.requires_grad = False
 
     def forward(self, features):
         x = self.model(features)
