@@ -1,6 +1,6 @@
 model_params:
   model: PneumoniaNet
-  encoder_name: densenet121
+  encoder_name: "densenet121"
   pretrained: False
 
 args:
@@ -12,6 +12,8 @@ stages:
   data_params:
     batch_size: 8
     num_workers: 2
+    path_to_dataset: /ws/pneumonia-ws/data/data_pneumonia
+#    path_to_dataset: /Users/nurdinov/Desktop/data_pneumonia
 
   state_params:
     main_metric: &main_metric accuracy01
@@ -23,7 +25,7 @@ stages:
   optimizer_params:
     optimizer: AdamW
     lr: 0.003
-    weight_decay: 0.005
+    weight_decay: 0.0
 
   scheduler_params:
     scheduler: ReduceLROnPlateau
@@ -34,7 +36,7 @@ stages:
 
   stage1:
     stage_params:
-      num_epochs: 3
+      num_epochs: 75
 
     callbacks_params:
       loss:
@@ -60,6 +62,11 @@ stages:
 
       auc:
         callback: AUCCallback
+
+      confusion_matrix:
+        callback: ConfusionMatrixCallback
+        class_names: ['normal', 'pneumonia', 'other']
+        num_classes: 3
 
       tracer:
         callback: TracerCallback

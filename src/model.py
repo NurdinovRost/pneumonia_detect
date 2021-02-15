@@ -4,7 +4,7 @@ from torchvision.models import resnext50_32x4d, resnext101_32x8d, densenet121, d
 from efficientnet_pytorch import EfficientNet
 
 
-out_neurons = 2
+out_neurons = 3
 
 
 @registry.Model
@@ -24,7 +24,7 @@ class PneumoniaNet(nn.Module):
                 self.model = resnext101_32x8d(pretrained=pretrained)
             n_features = self.model.fc.in_features
             self.model.fc = nn.Sequential(
-                nn.Dropout(p=0.7),
+                nn.Dropout(p=0.3),
                 nn.Linear(in_features=n_features, out_features=out_neurons, bias=True)
             )
         elif 'densenet' in encoder_name:

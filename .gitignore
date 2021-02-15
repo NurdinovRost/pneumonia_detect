@@ -19,3 +19,4 @@ env/
 logs/
 best_models/
 plots/
+pneumonia_logs/
