@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from catalyst.dl import ConfigExperiment
-from src.dataset import PneumoniaDataset, train_transforms, test_transforms
+from src.dataset import PneumoniaDataset, KaggleDataset
+from src.transforms import train_transforms, test_transforms
 
 
 class Experiment(ConfigExperiment):
