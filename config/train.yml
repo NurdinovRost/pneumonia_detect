@@ -1,6 +1,6 @@
 model_params:
   model: PneumoniaNet
-  encoder_name: densenet121
+  encoder_name: "densenet121"
   pretrained: False
 
 args:
@@ -10,8 +10,9 @@ args:
 
 stages:
   data_params:
-    batch_size: 8
-    num_workers: 2
+    batch_size: 32
+    num_workers: 4
+    path_to_dataset: ./data_pneumonia
 
   state_params:
     main_metric: &main_metric accuracy01
@@ -22,19 +23,19 @@ stages:
 
   optimizer_params:
     optimizer: AdamW
-    lr: 0.003
-    weight_decay: 0.005
+    lr: 0.0005
+    weight_decay: 0.0
 
   scheduler_params:
-    scheduler: ReduceLROnPlateau
-    mode: max
-    patience: 3
-    factor: 0.75
-    verbose: False
+    scheduler: CosineAnnealingWarmRestarts
+    T_0: 10
+    T_mult: 1
+    eta_min: 0.00005
+    last_epoch: -1
 
   stage1:
     stage_params:
-      num_epochs: 3
+      num_epochs: 250
 
     callbacks_params:
       loss:
@@ -58,8 +59,14 @@ stages:
       recall:
         callback: RecallCallback
 
-      auc:
-        callback: AUCCallback
+      confusion_matrix:
+        callback: ConfusionMatrixCallback
+        class_names: ['normal', 'pneumonia', 'other']
+        num_classes: 3
+        tensorboard_callback_name: tensorboard
+
+      tensorboard:
+        callback: TensorboardLogger
 
       tracer:
         callback: TracerCallback
